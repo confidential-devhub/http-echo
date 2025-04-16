@@ -40,7 +40,7 @@ There are two deployments available: `prem.yaml` which for the cloud-bursting us
 	```
 ### Limitations
 
-The pod only scales up, and never down.
+The pod memory footprint only scales up, and never down.
 
 ## Cloud-bursting use case
 
