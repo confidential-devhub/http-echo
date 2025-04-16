@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: on-prem-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-web-app
+  template:
+    metadata:
+      labels:
+        app: my-web-app
+    spec:
+      containers:
+      - name: my-web-app
+        image: quay.io/eesposit/http-echo-ema:latest
+        resources:
+          request:
+            memory: "1Gi" # TODO: set this
+          limits:
+            memory: "1Gi" # TODO: set this
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: MEMORY_LIMITS
+          valueFrom:
+            resourceFieldRef:
+              containerName: my-web-app
+              resource: limits.memory
+        - name: ATTESTATION # TODO: set this
+          value: "0"
+        - name: REQUEST_MEMORY_FOOTPRINT # TODO: set this
+          value: "100"
+        - name: MAX_MEMORY_STRESS_PERC # TODO: set this
+          value: "80"
+        ports:
+        - containerPort: 8080
+        securityContext:
+            privileged: true

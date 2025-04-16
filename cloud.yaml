@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-deployment
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: my-web-app
+  template:
+    metadata:
+      labels:
+        app: my-web-app
+        environment: cloud
+    spec:
+      runtimeClassName: kata-remote
+      initContainers:
+        - name: initcontainer
+          image: registry.redhat.io/ubi9/ubi:9.5
+          securityContext:
+            privileged: true
+          command: ["sh", "-c"]
+          args:
+            - ip link set vxlan0 type vxlan remote VPN.CLIENT.IP.HERE # TODO: insert IP
+      containers:
+      - name: my-web-app
+        image: quay.io/eesposit/http-echo-ema:latest
+        resources:
+          request:
+            memory: "1Gi" # TODO: set this
+          limits:
+            memory: "1Gi" # TODO: set this
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MEMORY_LIMITS
+          valueFrom:
+            resourceFieldRef:
+              containerName: my-web-app
+              resource: limits.memory
+        - name: ATTESTATION # TODO: set this
+          value: "1"
+        - name: MODEL_DECRYPTION_KEY # TODO: set this
+          value: "workload-key/key.bin"
+        - name: REQUEST_MEMORY_FOOTPRINT # TODO: set this
+          value: "100"
+        - name: MAX_MEMORY_STRESS_PERC # TODO: set this
+          value: "80"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        securityContext:
+          privileged: true
