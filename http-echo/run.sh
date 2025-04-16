@@ -4,6 +4,9 @@ set -e
 
 KEY_FILE=${KEY_FILE:-"key.bin"}
 
+LOC=$(realpath $0)
+DIR=$(dirname $LOC)
+
 if [ ! -f $KEY_FILE ]; then
 	echo "Error: key $KEY_FILE does not exists!"
 	echo "Generate one with \"openssl rand 32 > key.bin\" and then"
@@ -13,13 +16,13 @@ if [ ! -f $KEY_FILE ]; then
 fi
 
 # 1. build the http server
-go build  -o http-echo -ldflags "-w -extldflags '-static'" -tags netgo http-echo.go
+go build  -o $DIR/http-echo -ldflags "-w -extldflags '-static'" -tags netgo $DIR/http-echo.go
 
 # 2. encrypt the http server
-openssl enc -aes-256-cfb -pbkdf2 -kfile $KEY_FILE -in http-echo -out http-echo.enc
+openssl enc -aes-256-cfb -pbkdf2 -kfile $KEY_FILE -in $DIR/http-echo -out $DIR/http-echo.enc
 
 # 3. push the container
 if [ -n "$DOCKER_REPO" ]; then
-	podman build -t $DOCKER_REPO .
+	podman build -t $DOCKER_REPO $DIR
 	podman push $DOCKER_REPO
 fi
