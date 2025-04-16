@@ -2,7 +2,7 @@
 
 set -e
 
-APP_URL=$(oc get routes/my-web-app-route -o jsonpath='{.spec.host}')
+APP_URL=$(oc get routes/cdh-http-app-route -o jsonpath='{.spec.host}')
 PAUSE_TIMEOUT_SEC=1
 
 declare -A string_set

@@ -6,15 +6,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: my-web-app
+      app: cdh-http-app
   template:
     metadata:
       labels:
-        app: my-web-app
+        app: cdh-http-app
     spec:
       containers:
-      - name: my-web-app
-        image: quay.io/eesposit/http-echo-ema:latest
+      - name: cdh-http-app
+        image: quay.io/eesposit/http-echo:latest
         resources:
           request:
             memory: "1Gi" # TODO: set this
@@ -29,7 +29,7 @@ spec:
         - name: MEMORY_LIMITS
           valueFrom:
             resourceFieldRef:
-              containerName: my-web-app
+              containerName: cdh-http-app
               resource: limits.memory
         - name: ATTESTATION # TODO: set this
           value: "0"

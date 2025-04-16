@@ -12,6 +12,7 @@ There are two deployments available: `prem.yaml` which for the cloud-bursting us
 
 1. key.bin must be uploaded in the Trustee.
 2. before running count_calls.sh you must have logged in with `oc`
+3. `cloud.yaml` has a relaxed policy that allows logs
 
 ## Deployment variables
 
@@ -25,12 +26,12 @@ There are two deployments available: `prem.yaml` which for the cloud-bursting us
 1. Either build your own http-echo image by running `./http-echo/run.sh`, or use `quay.io/confidential-devhub/http-echo:latest`. If you use the `cofidential-devhub` image, the model is encrypted using this key: https://people.redhat.com/~eesposit/key.bin
 1. Apply your KEDA policy
 2. Modify the env vars in `cloud.yaml` and then apply it
-   1. For cloud bursting: set the ip in `cloud.yaml` line 25. This is because the worker node has two IPs: node IP (which is its internal IP) and VPN client IP (to connect with Azure). By default, the CoCo pod and CVM underneath are configured to talk with the node IP, which works if the pod is in the same environment. But since the pod is on Azure, the remote ip has to be changed.
+   1. For cloud bursting: set the ip in `VPN_IP` env var of `cloud.yaml`. This is because the worker node has two IPs: node IP (which is its internal IP) and VPN client IP (to connect with Azure). By default, the CoCo pod and CVM underneath are configured to talk with the node IP, which works if the pod is in the same environment. But since the pod is on Azure, the remote ip has to be changed.
 3. Modify the env vars in `prem.yaml` and then apply it
 4. Apply `network.yaml`
-   1. If the route is unreachable, add the route to /etc/hosts: `<your ip>      my-web-app-route-default.apps.coco2410.kata.com`
+   1. If the route is unreachable, add the route to /etc/hosts: `<your ip>      cdh-http-app-route-default.apps.coco2410.kata.com`
 5. Run `count_calls.sh` and observe the result. Otherwise try manually:
-   1. `APP_URL=$(oc get routes/my-web-app-route -o jsonpath='{.spec.host}')`:
+   1. `APP_URL=$(oc get routes/cdh-http-app-route -o jsonpath='{.spec.host}')`:
    2. `curl $APP_URL` and notice how the ip address changes
 	```
 	# curl $APP_URL
