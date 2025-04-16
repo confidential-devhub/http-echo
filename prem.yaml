@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: cdh-http-app
-        image: quay.io/eesposit/http-echo:latest
+        image: quay.io/confidential-devhub/http-echo:latest
         resources:
           request:
             memory: "1Gi" # TODO: set this
